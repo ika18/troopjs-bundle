@@ -1,5 +1,5 @@
 /**
- * troopjs-bundle - 2.0.0-60-gc0c28d1
+ * troopjs-bundle - 2.0.0-69-gb346b0c
  * @license MIT http://troopjs.mit-license.org/ © Mikael Karon mailto:mikael@karon.se
  */
 /*global define:false */
@@ -429,7 +429,7 @@ define('troopjs-core/component/factory',[ "troopjs-utils/unique", "poly/object" 
 	var ARRAY_PUSH = ARRAY_PROTO.push;
 	var ARRAY_UNSHIFT = ARRAY_PROTO.unshift;
 	var OBJECT_TOSTRING = Object[PROTOTYPE][TOSTRING];
-	var TYPEOF_FUNCTION = typeof function () {};
+	var TYPEOF_FUNCTION = "function";
 	var DISPLAYNAME = "displayName";
 	var LENGTH = "length";
 	var EXTEND = "extend";
@@ -3629,7 +3629,7 @@ define('troopjs-browser/component/widget',[ "troopjs-core/component/gadget", "jq
 	var UNDEFINED;
 	var ARRAY_PROTO = Array.prototype;
 	var ARRAY_SLICE = ARRAY_PROTO.slice;
-	var TYPEOF_FUNCTION = typeof function () {};
+	var TYPEOF_FUNCTION = "function";
 	var $WEAVE = $.fn.weave;
 	var $UNWEAVE = $.fn.unweave;
 	var $ELEMENT = "$element";
