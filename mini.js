@@ -1,5 +1,5 @@
 /**
- * troopjs-bundle - 2.0.0-70-gfce2421
+ * troopjs-bundle - 2.0.0-72-g848fb0d
  * @license MIT http://troopjs.mit-license.org/ © Mikael Karon mailto:mikael@karon.se
  */
 /*global define:false */
@@ -1676,7 +1676,7 @@ define('troopjs-utils/merge',[ "poly/object" ], function MergeModule() {
  * @license MIT http://troopjs.mit-license.org/ © Mikael Karon mailto:mikael@karon.se
  */
 /*global define:false */
-define('troopjs-core/component/base',[ "../component/factory", "when", "troopjs-utils/merge" ], function ComponentModule(Factory, when, merge) {
+define('troopjs-core/component/base',[ "./factory", "when", "troopjs-utils/merge" ], function ComponentModule(Factory, when, merge) {
 	/*jshint laxbreak:true */
 
 	var ARRAY_PROTO = Array.prototype;
