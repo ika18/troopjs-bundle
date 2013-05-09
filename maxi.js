@@ -1,5 +1,5 @@
 /**
- * troopjs-bundle - 2.0.0-75-ga85b10c
+ * troopjs-bundle - 2.0.0-77-g3b585ba
  * @license MIT http://troopjs.mit-license.org/ © Mikael Karon mailto:mikael@karon.se
  */
 /*global define:false */
