@@ -1,6 +1,6 @@
 {
   "name": "troopjs-bundle",
-  "version": "2.0.0-72-g848fb0d",
+  "version": "2.0.0-75-ga85b10c",
   "author": {
     "name": "Mikael Karon",
     "email": "mikael@karon.se"
@@ -12,23 +12,10 @@
   "bugs": {
     "url": "https://github.com/troopjs/troopjs-bundle/issues"
   },
-  "licenses": {
-    "0": {
+  "licenses": [
+    {
       "type": "MIT",
       "url": "http://troopjs.mit-license.org/"
     }
-  },
-  "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-requirejs": "~0.4.0",
-    "grunt-contrib-uglify": "~0.2.0",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-clean": "~0.4.1",
-    "grunt-plugin-buster": "~2.0.0",
-    "grunt-git-describe": "~2.0.1",
-    "grunt-git-dist": "~0.1.1",
-    "grunt-json-replace": "~0.1.1",
-    "grunt-lexicon": "~0.1.8",
-    "buster": "~0.6.12"
-  }
+  ]
 }
