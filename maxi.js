@@ -1,5 +1,5 @@
 /**
- * troopjs-bundle - 2.0.0-77-g3b585ba
+ * troopjs-bundle - 2.0.0-81-g639f791
  * @license MIT http://troopjs.mit-license.org/ © Mikael Karon mailto:mikael@karon.se
  */
 /*global define:false */
@@ -1808,6 +1808,35 @@ define('troopjs-core/component/base',[ "./factory", "when", "troopjs-utils/merge
 	});
 });
 
+/**
+ * TroopJS core/logger/console
+ * @license MIT http://troopjs.mit-license.org/ © Mikael Karon mailto:mikael@karon.se
+ */
+/*global define:false */
+define('troopjs-core/logger/console',[ "../component/base" ], function ConsoleLogger(Component) {
+	var CONSOLE = console;
+
+	function noop() {}
+
+	return Component.create({
+			"displayName" : "core/logger/console"
+		},
+		CONSOLE
+			? {
+			"log" : CONSOLE.log.bind(CONSOLE),
+			"warn" : CONSOLE.warn.bind(CONSOLE),
+			"debug" : CONSOLE.debug.bind(CONSOLE),
+			"info" : CONSOLE.info.bind(CONSOLE),
+			"error" : CONSOLE.error.bind(CONSOLE)
+		}
+			: {
+			"log" : noop,
+			"warn" : noop,
+			"debug" : noop,
+			"info" : noop,
+			"error" : noop
+		});
+});
 /*
 	Array -- a stand-alone module for using Javascript 1.6 array features
 	in lame-o browsers that don't support Javascript 1.6
@@ -2621,6 +2650,49 @@ define('troopjs-core/pubsub/hub',[ "../event/emitter" ], function HubModule(Emit
 });
 
 /**
+ * TroopJS core/logger/pubsub
+ * @license MIT http://troopjs.mit-license.org/ © Mikael Karon mailto:mikael@karon.se
+ */
+/*global define:false */
+define('troopjs-core/logger/pubsub',[ "../component/base", "../pubsub/hub" ], function PubSubLogger(Component, hub) {
+	var ARRAY_PUSH = Array.prototype.push;
+	var PUBLISH = hub.publish;
+
+	return Component.create({
+		"displayName" : "core/logger/pubsub",
+
+		"log": function log() {
+			var args = [ "logger/log" ];
+			ARRAY_PUSH.apply(args, arguments);
+			PUBLISH.apply(hub, args);
+		},
+
+		"warn" : function warn() {
+			var args = [ "logger/warn" ];
+			ARRAY_PUSH.apply(args, arguments);
+			PUBLISH.apply(hub, args);
+		},
+
+		"debug" : function debug() {
+			var args = [ "logger/debug" ];
+			ARRAY_PUSH.apply(args, arguments);
+			PUBLISH.apply(hub, args);
+		},
+
+		"info" : function info() {
+			var args = [ "logger/info" ];
+			ARRAY_PUSH.apply(args, arguments);
+			PUBLISH.apply(hub, args);
+		},
+
+		"error" : function info() {
+			var args = [ "logger/error" ];
+			ARRAY_PUSH.apply(args, arguments);
+			PUBLISH.apply(hub, args);
+		}
+	});
+});
+/**
  * TroopJS core/component/gadget
  * @license MIT http://troopjs.mit-license.org/ © Mikael Karon mailto:mikael@karon.se
  */
@@ -2875,6 +2947,106 @@ define('troopjs-core/component/service',[ "./gadget" ], function ServiceModule(G
 			var self = this;
 
 			return self.publish("registry/remove", self);
+		}
+	});
+});
+/**
+ * TroopJS core/logger/pubsub
+ * @license MIT http://troopjs.mit-license.org/ © Mikael Karon mailto:mikael@karon.se
+ */
+/*global define:false */
+define('troopjs-core/logger/service',[ "../component/service", "troopjs-utils/merge", "when" ], function logger(Service, merge, when) {
+	var ARRAY_PROTO = Array.prototype;
+	var ARRAY_SLICE = ARRAY_PROTO.slice;
+	var ARRAY_PUSH = ARRAY_PROTO.push;
+	var OBJECT_TOSTRING = String.prototype.toString;
+	var TOSTRING_OBJECT = "[object Object]";
+	var LENGTH = "length";
+	var APPENDERS = "appenders";
+
+	function forward(_signal, _args) {
+		var self = this;
+		var signal = self.signal;
+		var args = [ _signal ];
+		var appenders = self[APPENDERS];
+		var index = 0;
+
+		ARRAY_PUSH.apply(args, _args);
+
+		var next = function () {
+			var appender;
+
+			return (appender = appenders[index++])
+				? when(signal.apply(appender, args), next)
+				: when.resolve(_args);
+		};
+
+		return next();
+	}
+
+	function convert(cat, message) {
+		var result = {
+			"cat" : cat,
+			"time": new Date().getTime()
+		};
+
+		if (OBJECT_TOSTRING.call(message) === TOSTRING_OBJECT) {
+			merge.call(result, message);
+		}
+		else {
+			result.msg = message;
+		}
+
+		return result;
+	}
+
+	function append(obj) {
+		var self = this;
+		var appenders = self[APPENDERS];
+		var i;
+		var iMax;
+
+		for (i = 0, iMax = appenders[LENGTH]; i < iMax; i++) {
+			appenders[i].append(obj);
+		}
+	}
+
+	return Service.extend(function LoggerService() {
+		this[APPENDERS] = ARRAY_SLICE.call(arguments);
+	}, {
+		displayName : "core/logger/service",
+
+		"sig/initialize" : function onInitialize() {
+			return forward.call(this, "initialize", arguments);
+		},
+		"sig/start" : function onStart() {
+			return forward.call(this, "start", arguments);
+		},
+		"sig/stop" : function onStop() {
+			return forward.call(this, "stop", arguments);
+		},
+		"sig/finalize" : function onFinalize() {
+			return forward.call(this, "finalize", arguments);
+		},
+
+		"hub/logger/log" : function onLog(message) {
+			append.call(this, convert("log", message));
+		},
+
+		"hub/logger/warn" : function onWarn(message) {
+			append.call(this, convert("warn", message));
+		},
+
+		"hub/logger/debug" : function onDebug(message) {
+			append.call(this, convert("debug", message));
+		},
+
+		"hub/logger/info" : function onInfo(message) {
+			append.call(this, convert("info", message));
+		},
+
+		"hub/logger/error" : function onError(message) {
+			append.call(this, convert("error", message));
 		}
 	});
 });
@@ -4610,7 +4782,9 @@ define('troopjs-requirejs/template',[],function TemplateModule() {
 });
 
 define('troopjs-bundle/micro',[
-	"troopjs-core/component/service",
+	"troopjs-core/logger/console",
+	"troopjs-core/logger/pubsub",
+	"troopjs-core/logger/service",
 	"troopjs-browser/ajax/service",
 	"troopjs-browser/application/widget",
 	"troopjs-browser/route/widget",
